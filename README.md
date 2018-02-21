@@ -11,3 +11,7 @@ Practice project to learn python
 ## Special thanks
 - Assets used from opengameart community
   - Skorpio (https://opengameart.org/users/skorpio)
+  - Bart (https://opengameart.org/users/bart)
+  - Jalastram (https://opengameart.org/users/jalastram)
+  - TinyWorlds (https://opengameart.org/users/tinyworlds)
+  - Qubodup (https://opengameart.org/users/qubodup)

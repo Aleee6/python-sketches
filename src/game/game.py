@@ -3,7 +3,7 @@ import sys
 import pygame
 import math
 from settings import RESOURCES, WINDOW_SIZE, SHIP_RESOURCES, SHIP_SIZE, PLAYER_DEFAULT_POSITION, BEAM_RESOURCES, BULLET_SIZE, \
-    CAPTION, FPS, FONT_COLOR, EXPLOSION_RESOURCES, EXPLOSION_SIZE
+    CAPTION, FPS, FONT_COLOR, EXPLOSION_RESOURCES, EXPLOSION_SIZE, SOUND_RESOURCES
 from sprites import Player, Enemy, PlayerBullet, EnemyBullet, Animation
 
 
@@ -58,10 +58,25 @@ def load_images():
     }
 
 
+def load_sounds():
+    player = pygame.mixer.Sound(SOUND_RESOURCES + "flaunch.wav")
+    enemy = pygame.mixer.Sound(SOUND_RESOURCES + "slimeball.wav")
+    boom = pygame.mixer.Sound(SOUND_RESOURCES + "explosion.wav")
+    player.set_volume(1)
+    enemy.set_volume(0.1)
+    boom.set_volume(0.5)
+    return {
+        "player": player,
+        "enemy": enemy,
+        "boom": boom
+    }
+
+
 class Game(object):
 
     def __init__(self):
         self.images = load_images()
+        self.sounds = load_sounds()
         self.clock = pygame.time.Clock()
         self.font = pygame.font.SysFont("comicsansms", 24)
         self.score = 0
@@ -110,6 +125,7 @@ class Game(object):
                         PlayerBullet(self.images["bullet"],
                                      (self.player.rect.centerx - BULLET_SIZE[0] / 2,
                                       self.player.rect.top - 20)))
+                    self.sounds["player"].play()
             elif event.type == pygame.USEREVENT:
                 self.spawn_enemy_bullet(
                     random.randint(0,
@@ -124,6 +140,7 @@ class Game(object):
             self.animations.add(Animation(self.images["boom2"],
                                           (enemy.rect.left, enemy.rect.top),
                                           1))
+            self.sounds["boom"].play()
         self.update_score()
         if len(self.enemies.sprites()) == 0:
             if self.max_enemy_bullets + 2 <= 50:
@@ -140,6 +157,7 @@ class Game(object):
         self.animations.add(Animation(self.images["boom2"],
                                       (self.player.rect.left, self.player.rect.top),
                                       1))
+        self.sounds["boom"].play()
         self.player = None
         self.fps /= 2
 
@@ -151,6 +169,7 @@ class Game(object):
                             (enemy.rect.centerx - BULLET_SIZE[0] / 2,
                              enemy.rect.bottom + 10))
             )
+            self.sounds["enemy"].play()
 
     def update(self):
         if self.player_alive:
@@ -213,9 +232,13 @@ if __name__ == "__main__":
     pygame.init()
     pygame.display.set_caption(CAPTION)
     pygame.display.set_mode(WINDOW_SIZE)
+    pygame.mixer.music.load(SOUND_RESOURCES + "xeon6.ogg")
+    pygame.mixer.music.set_volume(1)
+    pygame.mixer.music.play(-1)
     result = 1
     while result == 1:
         game = Game()
         result = game.main_loop()
+    pygame.mixer.music.stop()
     pygame.quit()
     sys.exit()
