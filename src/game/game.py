@@ -2,10 +2,10 @@ import random
 import sys
 import pygame
 import math
-from game.settings import WINDOW_SIZE, SHIP_SIZE, BULLET_SIZE, \
+from settings import WINDOW_SIZE, SHIP_SIZE, BULLET_SIZE, \
     CAPTION, FPS, FONT_COLOR, PLAYER_BULLET_SPEED, ENEMY_BULLET_SPEED
-from game.sprites import Player, Enemy, Bullet, Animation
-import game.resource_handler as res
+from sprites import Player, Enemy, Bullet, Animation
+import resource_handler as res
 
 
 class Game(object):
@@ -94,7 +94,6 @@ class Game(object):
                                       (sprite.rect.left, sprite.rect.top),
                                       1))
         self.sounds[res.EXPLOSION_SOUND].play()
-        print()
 
     def spawn_enemy_bullet(self, bullet_number):
         for i in range(bullet_number):
