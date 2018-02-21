@@ -2,9 +2,9 @@
 Practice project to learn python
 
 ## Content:
-- game
-  - simple space invaders like game to get familiar with pygame and basic python syntax
-- sketch
+- python.game
+  - simple space invaders like python.game to get familiar with pygame and basic python syntax
+- python.sketch
   - just the basic warmup Hello World! :)
 
 
