@@ -8,6 +8,7 @@ RESOURCES = os.path.dirname(__file__) + os.sep + "resources" + os.sep
 SHIP_RESOURCES = RESOURCES + "ships" + os.sep
 BEAM_RESOURCES = RESOURCES + "beams" + os.sep
 EXPLOSION_RESOURCES = RESOURCES + "explosion" + os.sep
+SOUND_RESOURCES = RESOURCES + "sound" + os.sep
 SHIP_SIZE = 20, 30
 BULLET_SIZE = 10, 15
 EXPLOSION_SIZE = 50, 50
