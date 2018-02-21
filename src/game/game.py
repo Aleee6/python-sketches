@@ -3,8 +3,8 @@ import sys
 import pygame
 import math
 from settings import RESOURCES, WINDOW_SIZE, SHIP_RESOURCES, SHIP_SIZE, PLAYER_DEFAULT_POSITION, BEAM_RESOURCES, BULLET_SIZE, \
-    CAPTION, FPS, FONT_COLOR, EXPLOSION_RESOURCES, EXPLOSION_SIZE, SOUND_RESOURCES
-from sprites import Player, Enemy, PlayerBullet, EnemyBullet, Animation
+    CAPTION, FPS, FONT_COLOR, EXPLOSION_RESOURCES, EXPLOSION_SIZE, SOUND_RESOURCES, PLAYER_BULLET_SPEED, ENEMY_BULLET_SPEED
+from sprites import Player, Enemy, Bullet, Animation
 
 
 def load_image(root, path, size):
@@ -86,7 +86,7 @@ class Game(object):
         self.screen = pygame.display.get_surface()
         self.running = True
         self.player_alive = True
-        self.player = Player(self.images["player"])
+        self.player = pygame.sprite.GroupSingle(Player(self.images["player"]))
         self.enemy_speed = 1
         self.enemies = self.create_enemies()
         self.max_enemy_speed = 3
@@ -105,7 +105,7 @@ class Game(object):
         enemy_image = self.images["enemy"]
         enemies = []
         padding = 20
-        space_left = (WINDOW_SIZE[0] - 10 * (SHIP_SIZE[0]+padding) + padding) / 2
+        space_left = (WINDOW_SIZE[0] - 10 * (SHIP_SIZE[0] + padding) + padding) / 2
         for i in range(1, 6):
             inverted = False if i % 2 != 0 else True
             offset_y = i * SHIP_SIZE[1]
@@ -122,9 +122,11 @@ class Game(object):
             elif self.player_alive and event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     self.playerBullets.add(
-                        PlayerBullet(self.images["bullet"],
-                                     (self.player.rect.centerx - BULLET_SIZE[0] / 2,
-                                      self.player.rect.top - 20)))
+                        Bullet(self.images["bullet"],
+                               (self.player.sprite.rect.centerx - BULLET_SIZE[0] / 2,
+                                self.player.sprite.rect.top - 20),
+                               PLAYER_BULLET_SPEED
+                               ))
                     self.sounds["player"].play()
             elif event.type == pygame.USEREVENT:
                 self.spawn_enemy_bullet(
@@ -148,32 +150,31 @@ class Game(object):
             if self.score % 100 == 0 and self.enemy_speed < self.max_enemy_speed:
                 self.enemy_speed += 1
 
-    def player_hit(self):
+    def player_hit(self, player):
         self.player_alive = False
         pygame.time.set_timer(pygame.USEREVENT, 0)
         self.animations.add(Animation(self.images["boom1"],
-                                      (self.player.rect.left, self.player.rect.top),
+                                      (player[0].rect.left, player[0].rect.top),
                                       0.5))
         self.animations.add(Animation(self.images["boom2"],
-                                      (self.player.rect.left, self.player.rect.top),
+                                      (player[0].rect.left, player[0].rect.top),
                                       1))
         self.sounds["boom"].play()
-        self.player = None
         self.fps /= 2
 
     def spawn_enemy_bullet(self, bullet_number):
         for i in range(bullet_number):
-            enemy = self.enemies.sprites()[random.randint(0, len(self.enemies)-1)]
+            enemy = self.enemies.sprites()[random.randint(0, len(self.enemies) - 1)]
             self.enemyBullets.add(
-                EnemyBullet(self.images["bullet"],
-                            (enemy.rect.centerx - BULLET_SIZE[0] / 2,
-                             enemy.rect.bottom + 10))
+                Bullet(self.images["bullet"],
+                       (enemy.rect.centerx - BULLET_SIZE[0] / 2,
+                        enemy.rect.bottom + 10),
+                       ENEMY_BULLET_SPEED)
             )
             self.sounds["enemy"].play()
 
     def update(self):
-        if self.player_alive:
-            self.player.update()
+        self.player.update()
         self.enemies.update()
         self.playerBullets.update(self.enemies, self.enemy_hit)
         self.enemyBullets.update(self.player, self.player_hit)
@@ -183,8 +184,7 @@ class Game(object):
         self.screen.blit(self.background, (0, 0))
         self.screen.blit(self.text,
                          (WINDOW_SIZE[0] / 2 - self.text.get_width() / 2, 10))
-        if self.player_alive:
-            self.player.draw(self.screen)
+        self.player.draw(self.screen)
         self.enemies.draw(self.screen)
         self.playerBullets.draw(self.screen)
         self.enemyBullets.draw(self.screen)
