@@ -2,8 +2,8 @@ import random
 import pygame
 import math
 from pygame.sprite import Sprite
-from settings import PLAYER_DEFAULT_SPEED, PLAYER_DEFAULT_POSITION, ENEMY_DEFAULT_SPEED, \
-    PLAYER_BULLET_SPEED, ENEMY_BULLET_SPEED, WINDOW_SIZE, SHIP_SIZE, FPS
+from settings import PLAYER_DEFAULT_SPEED, ENEMY_DEFAULT_SPEED, PLAYER_DEFAULT_POSITION, \
+    WINDOW_SIZE, SHIP_SIZE, FPS
 
 
 class Drawable(Sprite):
@@ -72,33 +72,18 @@ class Bullet(Drawable):
         super().__init__(texture, position)
         self.__speed = speed
 
-    def update(self):
+    def update(self, group, callback):
         self._move(self.__speed)
         if self.rect.top > WINDOW_SIZE[1] or self.rect.bottom < 0:
             self.kill()
+        self.check_collision(group, callback)
 
-
-class PlayerBullet(Bullet):
-    def __init__(self, texture, position):
-        super().__init__(texture, position, PLAYER_BULLET_SPEED)
-
-    def update(self, enemies, on_hit):
-        super().update()
-        hits = pygame.sprite.spritecollide(self, enemies, True)
-        if len(hits) > 0:
+    def check_collision(self, group, callback):
+        hits = pygame.sprite.spritecollide(self, group, True)
+        is_hit = len(hits) > 0
+        if is_hit:
             self.kill()
-            on_hit(hits)
-
-
-class EnemyBullet(Bullet):
-    def __init__(self, texture, position):
-        super().__init__(texture, position, ENEMY_BULLET_SPEED)
-
-    def update(self, player, player_hit):
-        super().update()
-        if player is not None and pygame.sprite.collide_rect(self, player):
-            self.kill()
-            player_hit()
+            callback(hits)
 
 
 class Animation(Drawable):
