@@ -2,10 +2,10 @@ import random
 import sys
 import pygame
 import math
-from settings import WINDOW_SIZE, SHIP_SIZE, BULLET_SIZE, \
+from python.game.settings import WINDOW_SIZE, SHIP_SIZE, BULLET_SIZE, \
     CAPTION, FPS, FONT_COLOR, PLAYER_BULLET_SPEED, ENEMY_BULLET_SPEED
-from sprites import Player, Enemy, Bullet, Animation
-import resource_handler as res
+from python.game.sprites import Player, Enemy, Bullet, Animation
+import python.game.resource_handler as res
 
 
 class Game(object):
@@ -17,7 +17,7 @@ class Game(object):
         self.font = pygame.font.SysFont("comicsansms", 24)
         self.score = 0
         self.background = self.images[res.BACKGROUND_IMAGE]
-        self.text = ""
+        self.score_text = ""
         self.update_score()
         self.screen = pygame.display.get_surface()
         self.running = True
@@ -35,7 +35,7 @@ class Game(object):
         self.fps = FPS
 
     def update_score(self):
-        self.text = self.font.render(str(self.score), True, FONT_COLOR)
+        self.score_text = self.font.render(str(self.score), True, FONT_COLOR)
 
     def create_enemies(self):
         enemy_image = self.images[res.ENEMY_SPRITE]
@@ -115,8 +115,7 @@ class Game(object):
 
     def draw(self):
         self.screen.blit(self.background, (0, 0))
-        self.screen.blit(self.text,
-                         (WINDOW_SIZE[0] / 2 - self.text.get_width() / 2, 10))
+        self.screen.blit(self.score_text, (WINDOW_SIZE[0] / 2 - self.score_text.get_width() / 2, 10))
         self.player.draw(self.screen)
         self.enemies.draw(self.screen)
         self.playerBullets.draw(self.screen)
